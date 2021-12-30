@@ -3,8 +3,11 @@ import streamlit as st
 from apps import calculation, homepage
 from multiapp import MultiApp
 
-st.set_page_config(layout="wide")
-
+st.set_page_config(
+    page_title='Race Time Calculator',
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 apps = MultiApp()
 
