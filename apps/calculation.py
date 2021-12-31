@@ -1,15 +1,56 @@
+from time import sleep
+
 import pandas as pd
 import streamlit as st
+
+import apps.calculation_functions as cf
 
 # import calculation_functions as cf
 
 
 def app():
 
-    # df = pd.read_csv(r"/data/F-thrust(v1).csv")
-    
+    #Form
+    form = st.empty()
+    with form.container():
+        with st.form(key='my_form'):
+            car_mass = st.number_input("CarMas")
+            friction_u = st.number_input("Friction U")
+            submit = st.form_submit_button(label='Submit')
 
-    # st.write(df)
+    if submit:
+        form.empty()
+        # for i in range(101):
+        #     st.progress(i)
+        #     #Excuting code          #Another way of doing progress
+        #     sleep(0.5)
+        # st.write("Done")
+        with st.spinner('Wait for it...'):
+
+            """Executing code"""
+            sleep(2)
+
+            #Load in datasets
+            F_thrust = 'https://raw.githubusercontent.com/Roosevelt-Racers/Race-Time-Calculator-V2/main/data/F-thurst(v1).csv'
+            F_thrust = pd.read_csv(F_thrust)
+
+            Co2_mass = 'https://raw.githubusercontent.com/Roosevelt-Racers/Race-Time-Calculator-V2/main/data/Co2-mass(v1).csv'
+            Co2_mass = pd.read_csv(Co2_mass)
+            
+            #Create one dataframe
+            df = pd.merge(F_thrust, Co2_mass , on='time(s)')
+
+            #Create total mass as mass
+            df['Co2-mass(g)'] = Co2_mass['Co2-mass(g)'] + car_mass
+            df = df.rename(columns={"Co2-mass(g)": "mass(g)"})
+
+            #Calculate Friction Force
+            df['F-friction(N)'] = [cf.cal_friction_f(total_mass=row,friction_u=friction_u) for row in df['mass(g)']]
+
+        st.success('Done!')
+        st.write(df)   
+        st.write(car_mass,friction_u)
+
 
 
 
