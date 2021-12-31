@@ -11,9 +11,9 @@ from streamlit import cache
 
 #Friciton Force (Ff)
 @cache
-def cal_friction_f(total_mass, friction_u):
+def cal_friction_f(total_mass, friction_mu):
     """Calculates Friction Force"""
-    Ff = total_mass/1000*9.81*friction_u
+    Ff = total_mass/1000*9.81*friction_mu
     return Ff
 
 ###############################################################################

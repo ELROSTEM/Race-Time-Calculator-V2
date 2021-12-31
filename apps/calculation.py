@@ -3,9 +3,27 @@ from time import sleep
 import pandas as pd
 import streamlit as st
 
-import apps.calculation_functions as cf
-
 # import calculation_functions as cf
+
+
+#Friciton Force (Ff)
+def cal_friction_f(total_mass, friction_mu):
+    """Calculates Friction Force"""
+    Ff = total_mass/1000*9.81*friction_mu
+    return Ff
+
+#Time generator
+def total_time_gen(interval=0.0017):
+    """
+    Generator that yields number all the way till 2 based on the interval provided
+
+    This generator is used to extend the time(s) in the dataframe so furture calculations
+    could be done until the car reaches the finish line.
+    """
+    time = 0
+    while time < 2:
+        yield time
+        time += interval
 
 
 def app():
@@ -15,10 +33,10 @@ def app():
     with form.container():
         with st.form(key='my_form'):
             car_mass = st.number_input("CarMas")
-            friction_u = st.number_input("Friction U")
+            friction_mu = st.number_input("Friction Mu")
             submit = st.form_submit_button(label='Submit')
 
-    if submit:
+    if submit == True and car_mass != 0 and friction_mu != 0:
         form.empty()
         # for i in range(101):
         #     st.progress(i)
@@ -28,7 +46,10 @@ def app():
         with st.spinner('Wait for it...'):
 
             """Executing code"""
-            sleep(2)
+            sleep(1)
+
+            data = {'time(s)': list(total_time_gen())}
+            df = pd.DataFrame(data)
 
             #Load in datasets
             F_thrust = 'https://raw.githubusercontent.com/Roosevelt-Racers/Race-Time-Calculator-V2/main/data/F-thurst(v1).csv'
@@ -38,20 +59,35 @@ def app():
             Co2_mass = pd.read_csv(Co2_mass)
             
             #Create one dataframe
-            df = pd.merge(F_thrust, Co2_mass , on='time(s)')
-
+            df_loaded = pd.merge(F_thrust, Co2_mass , on='time(s)')
+            df_loaded = df_loaded.drop(columns="time(s)")
+            df = pd.concat([df, df_loaded.reindex(df.index)], axis=1)
+            
             #Create total mass as mass
             df['Co2-mass(g)'] = Co2_mass['Co2-mass(g)'] + car_mass
             df = df.rename(columns={"Co2-mass(g)": "mass(g)"})
 
+            #Fill Nan values
+            df['mass(g)'] = df['mass(g)'].fillna(car_mass)
+            df['F-thrust(N)'] = df['F-thrust(N)'].fillna(0)
+
             #Calculate Friction Force
-            df['F-friction(N)'] = [cf.cal_friction_f(total_mass=row,friction_u=friction_u) for row in df['mass(g)']]
+            df['F-friction(N)'] = [cal_friction_f(total_mass=row,friction_mu=friction_mu) for row in df['mass(g)']]
 
         st.success('Done!')
-        st.write(df)   
-        st.write(car_mass,friction_u)
+        st.write(df)
+        st.write(car_mass,friction_mu)
+
+        # df2 = pd.concat([pd.DataFrame([i], columns=['time(s)']) for i in range(5)],
+        #   ignore_index=True)
 
 
+        # df["test"] = total_time_gen()
+
+        # st.write(df)
+
+    else:
+        st.warning("Please input all the required parameters")
 
 
 
