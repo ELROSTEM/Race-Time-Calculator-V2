@@ -111,17 +111,19 @@ def app():
                 df = pd.concat([df, df_loaded.reindex(df.index)], axis=1)
                 
                 #Create total mass as mass
+                Co2_empty = Co2_mass['Co2-mass(g)'].iloc[-1] + car_mass
                 df['Co2-mass(g)'] = Co2_mass['Co2-mass(g)'] + car_mass
                 df = df.rename(columns={"Co2-mass(g)": "mass(g)"})
 
                 #Fill Nan values
-                df['mass(g)'] = df['mass(g)'].fillna(car_mass)
+                df['mass(g)'] = df['mass(g)'].fillna(Co2_empty)
                 df['F-thrust(N)'] = df['F-thrust(N)'].fillna(0)
 
                 #Calculate Friction Force
                 df['F-friction(N)'] = [cal_friction_f(total_mass=row,friction_mu=friction_mu) for row in df['mass(g)']]
 
             st.success('Done!')
+            st.write(Co2_empty)
             st.write(df)
             st.write(car_mass,friction_mu)
 
