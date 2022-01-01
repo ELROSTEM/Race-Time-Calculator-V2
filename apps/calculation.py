@@ -28,67 +28,112 @@ def total_time_gen(interval=0.0017):
 
 def app():
 
+
+##############################################################################################
+    """Calculate Drag"""
+
     #Form
-    form = st.empty()
-    with form.container():
-        with st.form(key='my_form'):
+    form_drag = st.empty()
+    with form_drag.container():
+        with st.form(key='form_drag'):
+            area = st.number_input("Car Front area")
+            drag_mu = st.number_input("Drag Coeffecient")
+            submit = st.form_submit_button(label='Submit')
+
+    try:
+        if submit == True:
+
+            #Values can not be zero
+            assert(area !=0 and drag_mu !=0), "The input values can not be zero! 😤"
+
+            #Clear Form
+            form_drag.empty()
+
+
+            # for i in range(101):
+            #     st.progress(i)
+            #     #Excuting code          #Another way of doing progress
+            #     sleep(0.5)
+            # st.write("Done")
+            with st.spinner('Wait for it...'):
+                """Executing code"""
+                sleep(1)
+                st.write("HOLA")
+            
+    except Exception as e:
+        st.warning(e)
+        
+
+
+##############################################################################################
+    """Calculate DVA"""
+
+    #Form
+    form_dva = st.empty()
+    with form_dva.container():
+        with st.form(key='form_dva'):
             car_mass = st.number_input("CarMas")
             friction_mu = st.number_input("Friction Mu")
             submit = st.form_submit_button(label='Submit')
 
-    if submit == True and car_mass != 0 and friction_mu != 0:
-        form.empty()
-        # for i in range(101):
-        #     st.progress(i)
-        #     #Excuting code          #Another way of doing progress
-        #     sleep(0.5)
-        # st.write("Done")
-        with st.spinner('Wait for it...'):
+    try:
+        if submit == True:
 
-            """Executing code"""
-            sleep(1)
+            #Values can not be zero
+            assert(car_mass !=0 and friction_mu !=0), "Can the values be zero 🤔? no."
 
-            data = {'time(s)': list(total_time_gen())}
-            df = pd.DataFrame(data)
-
-            #Load in datasets
-            F_thrust = 'https://raw.githubusercontent.com/Roosevelt-Racers/Race-Time-Calculator-V2/main/data/F-thurst(v1).csv'
-            F_thrust = pd.read_csv(F_thrust)
-
-            Co2_mass = 'https://raw.githubusercontent.com/Roosevelt-Racers/Race-Time-Calculator-V2/main/data/Co2-mass(v1).csv'
-            Co2_mass = pd.read_csv(Co2_mass)
-            
-            #Create one dataframe
-            df_loaded = pd.merge(F_thrust, Co2_mass , on='time(s)')
-            df_loaded = df_loaded.drop(columns="time(s)")
-            df = pd.concat([df, df_loaded.reindex(df.index)], axis=1)
-            
-            #Create total mass as mass
-            df['Co2-mass(g)'] = Co2_mass['Co2-mass(g)'] + car_mass
-            df = df.rename(columns={"Co2-mass(g)": "mass(g)"})
-
-            #Fill Nan values
-            df['mass(g)'] = df['mass(g)'].fillna(car_mass)
-            df['F-thrust(N)'] = df['F-thrust(N)'].fillna(0)
-
-            #Calculate Friction Force
-            df['F-friction(N)'] = [cal_friction_f(total_mass=row,friction_mu=friction_mu) for row in df['mass(g)']]
-
-        st.success('Done!')
-        st.write(df)
-        st.write(car_mass,friction_mu)
-
-        # df2 = pd.concat([pd.DataFrame([i], columns=['time(s)']) for i in range(5)],
-        #   ignore_index=True)
+            #Clear Form
+            form_dva.empty()
 
 
-        # df["test"] = total_time_gen()
+            # for i in range(101):
+            #     st.progress(i)
+            #     #Excuting code          #Another way of doing progress
+            #     sleep(0.5)
+            # st.write("Done")
+            with st.spinner('Wait for it...'):
+                """Executing code"""
+                sleep(1)
 
-        # st.write(df)
+                data = {'time(s)': list(total_time_gen())}
+                df = pd.DataFrame(data)
 
-    else:
-        st.warning("Please input all the required parameters")
+                #Load in datasets
+                F_thrust = 'https://raw.githubusercontent.com/Roosevelt-Racers/Race-Time-Calculator-V2/main/data/F-thurst(v1).csv'
+                F_thrust = pd.read_csv(F_thrust)
 
+                Co2_mass = 'https://raw.githubusercontent.com/Roosevelt-Racers/Race-Time-Calculator-V2/main/data/Co2-mass(v1).csv'
+                Co2_mass = pd.read_csv(Co2_mass)
+                
+                #Create one dataframe
+                df_loaded = pd.merge(F_thrust, Co2_mass , on='time(s)')
+                df_loaded = df_loaded.drop(columns="time(s)")
+                df = pd.concat([df, df_loaded.reindex(df.index)], axis=1)
+                
+                #Create total mass as mass
+                df['Co2-mass(g)'] = Co2_mass['Co2-mass(g)'] + car_mass
+                df = df.rename(columns={"Co2-mass(g)": "mass(g)"})
+
+                #Fill Nan values
+                df['mass(g)'] = df['mass(g)'].fillna(car_mass)
+                df['F-thrust(N)'] = df['F-thrust(N)'].fillna(0)
+
+                #Calculate Friction Force
+                df['F-friction(N)'] = [cal_friction_f(total_mass=row,friction_mu=friction_mu) for row in df['mass(g)']]
+
+            st.success('Done!')
+            st.write(df)
+            st.write(car_mass,friction_mu)
+
+            # df2 = pd.concat([pd.DataFrame([i], columns=['time(s)']) for i in range(5)],
+            #   ignore_index=True)
+
+
+            # df["test"] = total_time_gen()
+
+            # st.write(df)
+    except Exception as e:
+        st.warning(e)
 
 
 #     ###############################################################################
