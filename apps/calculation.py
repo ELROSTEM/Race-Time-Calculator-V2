@@ -1,30 +1,23 @@
 from time import sleep
 
+import numpy as np
 import pandas as pd
 import streamlit as st
 
 # import calculation_functions as cf
 
 
+def cal_drag_f(area, drag_mu, velocity, fluid_density=1.225):
+    """Calculates Drag Force"""
+    """The ISA or International Standard Atmosphere states the density of air is 1.225 kg/m3 at sea level and 15 degrees C."""
+    Df = area*drag_mu*0.5*fluid_density*(velocity**2)
+    return Df
+
 #Friciton Force (Ff)
 def cal_friction_f(total_mass, friction_mu):
     """Calculates Friction Force"""
     Ff = total_mass/1000*9.81*friction_mu
     return Ff
-
-#Time generator
-def total_time_gen(interval=0.0017):
-    """
-    Generator that yields number all the way till 2 based on the interval provided
-
-    This generator is used to extend the time(s) in the dataframe so furture calculations
-    could be done until the car reaches the finish line.
-    """
-    time = 0
-    while time < 2:
-        yield time
-        time += interval
-
 
 def app():
 
@@ -36,29 +29,33 @@ def app():
     form_drag = st.empty()
     with form_drag.container():
         with st.form(key='form_drag'):
+            #User Input Values
             area = st.number_input("Car Front area")
             drag_mu = st.number_input("Drag Coeffecient")
             submit = st.form_submit_button(label='Submit')
 
     try:
         if submit == True:
-
             #Values can not be zero
             assert(area !=0 and drag_mu !=0), "The input values can not be zero! 😤"
-
             #Clear Form
             form_drag.empty()
 
-
-            # for i in range(101):
-            #     st.progress(i)
-            #     #Excuting code          #Another way of doing progress
-            #     sleep(0.5)
-            # st.write("Done")
             with st.spinner('Wait for it...'):
-                """Executing code"""
+                """Execute the code..."""
+
+                """Over here we need to create a pandas dataframe from
+                the values inputed and then store it as a variable."""
+                data = {'velocity(m/s)': np.arange(0, 200, 0.5, dtype=float)}
+                df_drag = pd.DataFrame(data)
+
+                """The ISA or International Standard Atmosphere states the density of air is 1.225 kg/m3 at sea level and 15 degrees C."""
+                df_drag['F-drag(N)'] = [cal_drag_f(area=area, drag_mu=drag_mu, velocity=row) for row in df_drag['velocity(m/s)']]
+
                 sleep(1)
-                st.write("HOLA")
+                st.write(df_drag)
+
+                st.line_chart(df_drag.set_index('velocity(m/s)'))
             
     except Exception as e:
         st.warning(e)
@@ -95,7 +92,7 @@ def app():
                 """Executing code"""
                 sleep(1)
 
-                data = {'time(s)': list(total_time_gen())}
+                data = {'time(s)': np.arange(0, 2, 0.0017, dtype=float)}
                 df = pd.DataFrame(data)
 
                 #Load in datasets
@@ -122,10 +119,36 @@ def app():
                 #Calculate Friction Force
                 df['F-friction(N)'] = [cal_friction_f(total_mass=row,friction_mu=friction_mu) for row in df['mass(g)']]
 
+
+                ############################################################3
+
+                df_dva = pd.DataFrame(columns=('col1', 'col2', 'distance(m)'))
+                df_dva.loc[0] = ['idk', 'idk', 0]
+
+                while df_dva['distance(m)'].values[-1] < 20:
+                    df_dva = df_dva.append({'col1': 'idk', 'col2': 'idk', 'distance(m)': (df_dva['distance(m)'].values[-1]+1)}, ignore_index=True)
+                    #^This code is just to test but it should refer to the current index and row in the iteration as we need to consider other values
+
+                # Class for each row
+                # We modify data
+                # Calcualte next class by previous class
+
+
+
+
+                # while df_dva['distance(m)'].loc[-1] < 20:
+                #     df = df.append({
+                #         "col1": "John",
+                #         "col2":  "Johny",
+                #         "distance(m)": 
+                #         }, ignore_index=True)
+                    # df_dva.loc[i] = ['<some value for first>','<some value for second>',df_dva['distance(m)'].loc[i-1]]
+
+
             st.success('Done!')
-            st.write(Co2_empty)
             st.write(df)
-            st.write(car_mass,friction_mu)
+
+            st.write(df_dva)
 
             # df2 = pd.concat([pd.DataFrame([i], columns=['time(s)']) for i in range(5)],
             #   ignore_index=True)
