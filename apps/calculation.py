@@ -19,6 +19,12 @@ def cal_friction_f(total_mass, friction_mu):
     return Ff
 
 def app():
+    """
+    This is the main app function
+    
+    It is broken into two parts. One part handles the Drag calculations. The other part calculates the DVA
+    
+    """
 
 
 ##############################################################################################
@@ -44,7 +50,7 @@ def app():
                 """Execute the code..."""
 
                 #Create Dataframe
-                data = {'velocity(m/s)': np.arange(0, 200, 0.5, dtype=float)}
+                data = {'velocity(m/s)': np.arange(0, 200, 0.1, dtype=float)}
                 df_drag = pd.DataFrame(data)
                 df_drag['F-drag(N)'] = [cal_drag_f(area=area, drag_mu=drag_mu, velocity=row) for row in df_drag['velocity(m/s)']]
 
@@ -145,16 +151,18 @@ def app():
                     """While the distance is not greater than 20 contiue calculating"""
 
                     #Append the known values
-                    df_dva = df_dva.append({'time(s)': df.loc[index, 'time(s)'], 'F-thrust(N)': df.loc[index, 'F-thrust(N)'], 'mass(g)': df.loc[index, 'mass(g)'], 'F-friction(N)': df.loc[index, 'F-friction(N)'], 'distance(m)': (df_dva['distance(m)'].values[-1]+1)}, ignore_index=True)
+                    df_dva = df_dva.append({
+                        'time(s)': df.loc[index, 'time(s)'],
+                        'F-thrust(N)': df.loc[index, 'F-thrust(N)'],
+                        'mass(g)': df.loc[index, 'mass(g)'],
+                        'F-friction(N)': df.loc[index, 'F-friction(N)'], 
+                        #Test
+                        'velocity(m/s)': (df_dva['velocity(m/s)'].values[-1]+1),
+                        'distance(m)': (df_dva['distance(m)'].values[-1]+1)}, 
+                        ignore_index=True)
                     
-
-                    # st.write(df_drag.loc[:, df_drag.loc['velocity(m/s)'] > 0])
-
-
-                    st.write(df_drag[df_drag['velocity(m/s)'] == 81])
                     #Read the Drag based off the previous velocity
-                    df_dva.loc[index, 'F-drag(N)'] = 0 # df_drag[df_drag['velocity(m/s)'] == 81].get('F-drag(N)')
-                    # df_drag.loc['velocity(m/s)'] == df_dva.loc[index-1, 'velocity(m/s)']
+                    df_dva.loc[index, 'F-drag(N)'] = list(df_drag.loc[df_drag['velocity(m/s)'] == round(df_dva.loc[index-1, 'velocity(m/s)'], 1)]['F-drag(N)'])[0]
 
                     #Calculate the Fnet
                     df_dva.loc[index, 'F-net(N)'] = (df_dva.loc[index, 'F-thrust(N)'] - df_dva.loc[index, 'F-friction(N)'] - df_dva.loc[index, 'F-drag(N)'])
