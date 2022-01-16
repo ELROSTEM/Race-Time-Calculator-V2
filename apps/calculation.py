@@ -13,7 +13,6 @@ def cal_drag_f(area, drag_mu, velocity, fluid_density=1.225):
     Df = area*drag_mu*0.5*fluid_density*(velocity**2)
     return Df
 
-#Friciton Force (Ff)
 def cal_friction_f(total_mass, friction_mu):
     """Calculates Friction Force"""
     Ff = total_mass/1000*9.81*friction_mu
@@ -44,18 +43,18 @@ def app():
             with st.spinner('Wait for it...'):
                 """Execute the code..."""
 
-                """Over here we need to create a pandas dataframe from
-                the values inputed and then store it as a variable."""
+                #Create Dataframe
                 data = {'velocity(m/s)': np.arange(0, 200, 0.5, dtype=float)}
                 df_drag = pd.DataFrame(data)
-
-                """The ISA or International Standard Atmosphere states the density of air is 1.225 kg/m3 at sea level and 15 degrees C."""
                 df_drag['F-drag(N)'] = [cal_drag_f(area=area, drag_mu=drag_mu, velocity=row) for row in df_drag['velocity(m/s)']]
 
                 sleep(1)
-                st.write(df_drag)
 
-                st.line_chart(df_drag.set_index('velocity(m/s)'))
+                #Display Data
+                st.header('Drag Over Velocity')
+                drag_col1, drag_col2 = st.columns([3, 1])
+                drag_col1.line_chart(df_drag.set_index('velocity(m/s)'))
+                drag_col2.write(df_drag)
             
     except Exception as e:
         st.warning(e)
@@ -122,12 +121,28 @@ def app():
 
                 ############################################################3
 
-                df_dva = pd.DataFrame(columns=('col1', 'col2', 'distance(m)'))
-                df_dva.loc[0] = ['idk', 'idk', 0]
+                df_dva = pd.DataFrame(columns=('time(s)', 'F-thrust(N)', 'mass(g)', 'F-friction(N)', 'F-drag(N)','F-net(N)', 'acceleration(m/s^2)', 'velocity(m/s)', 'distance(m)'))
+                df_dva.loc[0] = [df.iloc[0, 0], df.iloc[0, 1], df.iloc[0, 2], df.iloc[0, 3], 0, 0, 0, 0, 0]
 
+                index = 1
                 while df_dva['distance(m)'].values[-1] < 20:
-                    df_dva = df_dva.append({'col1': 'idk', 'col2': 'idk', 'distance(m)': (df_dva['distance(m)'].values[-1]+1)}, ignore_index=True)
-                    #^This code is just to test but it should refer to the current index and row in the iteration as we need to consider other values
+                    """While the distance is not greater than 20 contiue calculating"""
+                    df_dva = df_dva.append({'time(s)': df.iloc[index, 0], 'F-thrust(N)': df.iloc[index, 1], 'mass(g)': df.iloc[index, 2], 'F-friction(N)': df.iloc[index, 3], 'distance(m)': (df_dva['distance(m)'].values[-1]+1)}, ignore_index=True)
+                    
+                    #Read the Drag
+                    df_dva.iloc[index, 4] = 0
+
+                    #Calculate the Fnet
+                    df_dva.iloc[index, 5] = (df_dva.iloc[index, 1] - df_dva.iloc[index, 3] - df_dva.iloc[index, 4])
+
+                    #Calculate the acceleration
+                    df_dva.iloc[index, 6] = (df_dva.iloc[index, 1]/df_dva.iloc[index, 2] * 1000)
+
+                    #Calculate the velocity
+                    
+
+                    index += 1
+
 
                 # Class for each row
                 # We modify data
