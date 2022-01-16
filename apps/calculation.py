@@ -50,11 +50,18 @@ def app():
 
                 sleep(1)
 
+                #Create Session State
+                if 'df_drag' not in st.session_state:
+                    st.session_state.df_drag = df_drag
+
                 #Display Data
                 st.header('Drag Over Velocity')
                 drag_col1, drag_col2 = st.columns([3, 1])
                 drag_col1.line_chart(df_drag.set_index('velocity(m/s)'))
                 drag_col2.write(df_drag)
+
+
+
             
     except Exception as e:
         st.warning(e)
@@ -63,6 +70,12 @@ def app():
 
 ##############################################################################################
     """Calculate DVA"""
+
+    #Load in df_drag from session state                  
+    if 'df_drag' in st.session_state:
+        st.write(st.session_state.df_drag)
+        df_drag = st.session_state.df_drag
+        st.info("Drag force data has been loaded! Ready to run DVA 🏎️")
 
     #Form
     form_dva = st.empty()
@@ -74,6 +87,9 @@ def app():
 
     try:
         if submit == True:
+            
+            #Drag data must be calculated
+            assert('df_drag' in st.session_state), "You did not calculate the required drag data yet. 💢" 
 
             #Values can not be zero
             assert(car_mass !=0 and friction_mu !=0), "Can the values be zero 🤔? no."
@@ -122,21 +138,29 @@ def app():
                 ############################################################3
 
                 df_dva = pd.DataFrame(columns=('time(s)', 'F-thrust(N)', 'mass(g)', 'F-friction(N)', 'F-drag(N)','F-net(N)', 'acceleration(m/s^2)', 'velocity(m/s)', 'distance(m)'))
-                df_dva.loc[0] = [df.iloc[0, 0], df.iloc[0, 1], df.iloc[0, 2], df.iloc[0, 3], 0, 0, 0, 0, 0]
+                df_dva.loc[0] = [df.loc[0, 'time(s)'], df.loc[0, 'F-thrust(N)'], df.loc[0, 'mass(g)'], df.loc[0, 'F-friction(N)'], 0, 0, 0, 0, 0]
 
                 index = 1
                 while df_dva['distance(m)'].values[-1] < 20:
                     """While the distance is not greater than 20 contiue calculating"""
-                    df_dva = df_dva.append({'time(s)': df.iloc[index, 0], 'F-thrust(N)': df.iloc[index, 1], 'mass(g)': df.iloc[index, 2], 'F-friction(N)': df.iloc[index, 3], 'distance(m)': (df_dva['distance(m)'].values[-1]+1)}, ignore_index=True)
+
+                    #Append the known values
+                    df_dva = df_dva.append({'time(s)': df.loc[index, 'time(s)'], 'F-thrust(N)': df.loc[index, 'F-thrust(N)'], 'mass(g)': df.loc[index, 'mass(g)'], 'F-friction(N)': df.loc[index, 'F-friction(N)'], 'distance(m)': (df_dva['distance(m)'].values[-1]+1)}, ignore_index=True)
                     
-                    #Read the Drag
-                    df_dva.iloc[index, 4] = 0
+
+                    # st.write(df_drag.loc[:, df_drag.loc['velocity(m/s)'] > 0])
+
+
+                    st.write(df_drag[df_drag['velocity(m/s)'] == 81])
+                    #Read the Drag based off the previous velocity
+                    df_dva.loc[index, 'F-drag(N)'] = 0 # df_drag[df_drag['velocity(m/s)'] == 81].get('F-drag(N)')
+                    # df_drag.loc['velocity(m/s)'] == df_dva.loc[index-1, 'velocity(m/s)']
 
                     #Calculate the Fnet
-                    df_dva.iloc[index, 5] = (df_dva.iloc[index, 1] - df_dva.iloc[index, 3] - df_dva.iloc[index, 4])
+                    df_dva.loc[index, 'F-net(N)'] = (df_dva.loc[index, 'F-thrust(N)'] - df_dva.loc[index, 'F-friction(N)'] - df_dva.loc[index, 'F-drag(N)'])
 
                     #Calculate the acceleration
-                    df_dva.iloc[index, 6] = (df_dva.iloc[index, 1]/df_dva.iloc[index, 2] * 1000)
+                    df_dva.loc[index, 'acceleration(m/s^2)'] = (df_dva.loc[index, 'F-net(N)']/df_dva.loc[index, 'mass(g)'] * 1000)
 
                     #Calculate the velocity
                     
