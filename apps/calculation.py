@@ -185,6 +185,7 @@ def app():
                         ignore_index=True)
                     
                     #Read the Drag based off the previous velocity
+                    """The problem is here the list is here right beneath the workd here """
                     df_dva.loc[index, 'F-drag(N)'] = list(df_drag.loc[df_drag['velocity(m/s)'] == round(df_dva.loc[index-1, 'velocity(m/s)'], 1)]['F-drag(N)'])[0]
 
                     #Calculate the Fnet
@@ -197,11 +198,13 @@ def app():
                     df_dva.loc[index, 'delta-v(m/s)'] = (interval * (df_dva.loc[index-1, 'acceleration(m/s^2)'] + df_dva.loc[index, 'acceleration(m/s^2)']) / 2)
 
                     #Calculate the velocity
-                    st.write("current acc: " + str(df_dva.loc[index, 'acceleration(m/s^2)']))
-                    st.write("prev delta: " + str(df_dva.loc[index-1, 'delta-v(m/s)']))
-                    st.write("current delta: " + str(df_dva.loc[index, 'delta-v(m/s)']))
-                    df_dva.loc[index, 'velocity(m/s)'] = (df_dva.loc[index-1, 'delta-v(m/s)'] + df_dva.loc[index, 'delta-v(m/s)'])
-                    st.write(df_dva.loc[index, 'velocity(m/s)'])
+                    # st.write("current acc: " + str(df_dva.loc[index, 'acceleration(m/s^2)']))
+                    # st.write("prev velocity: " + str(df_dva.loc[index-1, 'velocity(m/s)']))
+                    # st.write("current delta: " + str(df_dva.loc[index, 'delta-v(m/s)']))
+                    df_dva.loc[index, 'velocity(m/s)'] = (df_dva.loc[index-1, 'velocity(m/s)'] + df_dva.loc[index, 'delta-v(m/s)'])
+                    # st.write(df_dva.loc[index, 'velocity(m/s)'])
+
+                    st.write(df_dva)
 
                     """
                     When the above code is ran it returns an unhelpful list index out of range
