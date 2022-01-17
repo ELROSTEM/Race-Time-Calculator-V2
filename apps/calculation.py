@@ -26,6 +26,7 @@ def app():
     
     """
 
+    interval = 0.0017
 
 ##############################################################################################
     """Calculate Drag"""
@@ -113,7 +114,7 @@ def app():
                 """Executing code"""
                 sleep(1)
 
-                data = {'time(s)': np.arange(0, 2, 0.0017, dtype=float)}
+                data = {'time(s)': np.arange(0, 2, interval, dtype=float)}
                 df = pd.DataFrame(data)
 
                 #Load in datasets
@@ -143,8 +144,30 @@ def app():
 
                 ############################################################3
 
-                df_dva = pd.DataFrame(columns=('time(s)', 'F-thrust(N)', 'mass(g)', 'F-friction(N)', 'F-drag(N)','F-net(N)', 'acceleration(m/s^2)', 'velocity(m/s)', 'distance(m)'))
-                df_dva.loc[0] = [df.loc[0, 'time(s)'], df.loc[0, 'F-thrust(N)'], df.loc[0, 'mass(g)'], df.loc[0, 'F-friction(N)'], 0, 0, 0, 0, 0]
+                # #Create the Dataframe
+                # df_dva = pd.DataFrame(columns=(
+                #     'time(s)',
+                #     'F-thrust(N)',
+                #     'mass(g)',
+                #     'F-friction(N)',
+                #     'F-drag(N)',
+                #     'F-net(N)',
+                #     'acceleration(m/s^2)',
+                #     'delta-v(m/s)'
+                #     'velocity(m/s)', 
+                #     'delta-d(m)'
+                #     'distance(m)'))
+
+                # df_dva.loc[0] = [
+                #     df.loc[0, 'time(s)'],
+                #     df.loc[0, 'F-thrust(N)'],
+                #     df.loc[0, 'mass(g)'],
+                #     df.loc[0, 'F-friction(N)'], 
+                #     0, 0, 0, 0, 0]
+
+
+                df_dva = pd.DataFrame(columns=('time(s)', 'F-thrust(N)', 'mass(g)', 'F-friction(N)', 'F-drag(N)', 'F-net(N)', 'acceleration(m/s^2)', 'delta-v(m/s)', 'velocity(m/s)', 'delta-d(m)', 'distance(m)'))
+                df_dva.loc[0] = [df.loc[0, 'time(s)'], df.loc[0, 'F-thrust(N)'], df.loc[0, 'mass(g)'], df.loc[0, 'F-friction(N)'], 0, 0, 0, 0, 0, 0, 0]
 
                 index = 1
                 while df_dva['distance(m)'].values[-1] < 20:
@@ -157,7 +180,7 @@ def app():
                         'mass(g)': df.loc[index, 'mass(g)'],
                         'F-friction(N)': df.loc[index, 'F-friction(N)'], 
                         #Test
-                        'velocity(m/s)': (df_dva['velocity(m/s)'].values[-1]+1),
+                        # 'velocity(m/s)': (df_dva['distance(m)'].values[-1]+1),
                         'distance(m)': (df_dva['distance(m)'].values[-1]+1)}, 
                         ignore_index=True)
                     
@@ -170,7 +193,29 @@ def app():
                     #Calculate the acceleration
                     df_dva.loc[index, 'acceleration(m/s^2)'] = (df_dva.loc[index, 'F-net(N)']/df_dva.loc[index, 'mass(g)'] * 1000)
 
+                    #Calculate the delta-velocity
+                    df_dva.loc[index, 'delta-v(m/s)'] = (interval * (df_dva.loc[index-1, 'acceleration(m/s^2)'] + df_dva.loc[index, 'acceleration(m/s^2)']) / 2)
+
                     #Calculate the velocity
+                    st.write("current acc: " + str(df_dva.loc[index, 'acceleration(m/s^2)']))
+                    st.write("prev delta: " + str(df_dva.loc[index-1, 'delta-v(m/s)']))
+                    st.write("current delta: " + str(df_dva.loc[index, 'delta-v(m/s)']))
+                    df_dva.loc[index, 'velocity(m/s)'] = (df_dva.loc[index-1, 'delta-v(m/s)'] + df_dva.loc[index, 'delta-v(m/s)'])
+                    st.write(df_dva.loc[index, 'velocity(m/s)'])
+
+                    """
+                    When the above code is ran it returns an unhelpful list index out of range
+                    error. I think this happens is because when it calculates the new velocity it
+                    can not find that velocity on the drag dataframe because the velocity is greater
+                    than the maximum velocity on the drag dataframe. However when I write out the 
+                    velocity it doesnt not seem like that is the problem. This is because it is able
+                    to do like 6 iterations before returning an exception.
+
+                    To reproduce the error:
+                    1. uncomment out the test velocity 
+                    2. uncomment the code that calcs velocity
+                    
+                    """
                     
 
                     index += 1
