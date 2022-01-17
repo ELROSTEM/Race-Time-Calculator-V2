@@ -79,8 +79,9 @@ def app():
                 df['F-friction(N)'] = [cal_friction_f(total_mass=row,friction_mu=friction_mu) for row in df['mass(g)']]
 
 
-                ############################################################3
-                """Calculate DVA"""
+            ############################################################3
+            #Calculate DVA
+            
                 # #Create the Dataframe
                 df_dva = pd.DataFrame(columns=('time(s)', 'F-thrust(N)', 'mass(g)', 'F-friction(N)', 'F-drag(N)', 'F-net(N)', 'acceleration(m/s^2)', 'delta-v(m/s)', 'velocity(m/s)', 'delta-d(m)', 'distance(m)'))
                 df_dva.loc[0] = [df.loc[0, 'time(s)'], df.loc[0, 'F-thrust(N)'], df.loc[0, 'mass(g)'], df.loc[0, 'F-friction(N)'], 0, 0, 0, 0, 0, 0, 0]
@@ -122,7 +123,77 @@ def app():
                     index += 1
 
             st.success('Done!')
+
+
+        #---------------------------------------
+        # Metric
+
+            top_speed = (df_dva['velocity(m/s)'].max())*(18/5)
+            end_time = df_dva['time(s)'].values[-1]
+
+            metric_col1, metric_col2 = st.columns(2)
+            metric_col1.metric("Top Speed (km/hr)", round(top_speed, 4))
+            metric_col2.metric("End time (sec)", round(end_time, 4))
+            # metric_col3.metric("Efficiency", "86%", "4%")
+
+        #---------------------------------------
+        #Graphs
+
+            #Acceleration Graph
+            acc_dataframe = df_dva[['time(s)', 'acceleration(m/s^2)']]
+            st.header('Acceleration Over Time')
+            acc_col1, acc_col2 = st.columns([3, 1])
+            acc_col1.subheader('Acceleration Over Time Chart')
+            acc_col1.line_chart(acc_dataframe.rename(columns={'time(s)':'index'}).set_index('index'))
+            acc_col2.subheader('Acceleration DataFrame')
+            acc_col2.write(acc_dataframe)
+            #Acceleration Expander
+            acc_expander = st.expander('What did we do?')
+            acc_expander.write("We did these calculation:")
+            acc_expander.latex(r'''F_{net} = F_{CO2} – F_{D} – F{f} = (m_{car} + m_{CO2}) a''')
+
+            #Velocity Graph
+            v_dataframe = df_dva[['time(s)', 'velocity(m/s)']]
+            st.header('Velocity Over Time')
+            v_col1, v_col2 = st.columns([3, 1])
+            v_col1.subheader('Velocity Over Time Chart')
+            v_col1.line_chart(v_dataframe.rename(columns={'time(s)':'index'}).set_index('index'))
+            v_col2.subheader('Velocity DataFrame')
+            v_col2.write(v_dataframe)
+            #Velocity Expander
+            v_expander = st.expander('What did we do?')
+            v_expander.write("We did these calculation:")
+            v_expander.latex(r'''
+                v_{n}=\sum_{0}^{n} \frac{\left[a\left(t_{n}\right)+a\left(t_{n+1}\right)\right]}{2} \bullet\left(t_{n+1}-t_{n}\right)
+            ''')
+            
+            #Distance Graph
+            d_dataframe = df_dva[['time(s)', 'distance(m)']]
+            st.header('Distance Over Time')
+            d_col1, d_col2 = st.columns([3, 1])
+            d_col1.subheader('Distance Over Time Chart')
+            d_col1.line_chart(d_dataframe.rename(columns={'time(s)':'index'}).set_index('index'))
+            d_col2.subheader('Distance DataFrame')
+            d_col2.write(d_dataframe)
+            #Distance Expander
+            d_expander = st.expander('What did we do?')
+            d_expander.write("We did these calculation:")
+            d_expander.latex(r'''
+                d_{n}=\sum_{0}^{n} \frac{\left[v\left(t_{n}\right)+v\left(t_{n+1}\right)\right]}{2} \bullet\left(t_{n+1}-t_{n}\right)
+            ''')
+
+
+            st.header("The full data table:")
             st.write(df_dva)
+
+            dva_csv = df_dva.to_csv().encode('utf-8')
+            st.download_button(
+                label="Download DVA data as CSV",
+                data=dva_csv,
+                file_name='dva_data.csv',
+                mime='text/csv',)
+
+
 
     except Exception as e:
         st.warning(e)
