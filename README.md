@@ -19,6 +19,17 @@ The Race Time Calculator, built by RR's R&D team, the purpose of the race time c
 
 ![image](https://user-images.githubusercontent.com/65325330/145687502-010de8e2-9607-4480-90bd-4636e97b79c9.png)
 
+# Statement of Need
+The Race Time Calculator will serve as a virtual track for F1 in schools teams. However, this app is more thatn that. With our app we will solve the following problems currently present in the whole F1 in schools competetion itself:
+
+- Lower the barrier of entry: If a school wanted to test their dragster they would need to purchase a track. The track costs $500. We will allow more underprivileged schools to join the competition by giving them access to our race time calculator.
+
+- Help existing teams without a track: In 2017, a team from Michigan asked if they could come all the way to NYC to test their car model because we have a track. They came all the way to Eleanor Roosevelt Highschool to test their model and their dragster actually won second place nationaly. This made us realize how crucial it is to test car models and that was how the Race Time Calculator poject started.
+
+- Streamline the development process: All teams will be able to benefit from this app. If a team used the Race Time calculator they would be able to iterate through multiple models extremely quickly. This is because they would be able to calculate the theortical end time of their car model, IF their manufacturing was perfect. Therefore, if they calculated that their car reached their time goals then the only process the engineering team needs to worry about is polishing their manufacturing as much as possible.
+
+- Data driven decision: Last but not least our Race Time Calculator will allow for data driven decisions. Teams will be able to log data between calculated time vs real time to optimize their development process. They will also be able to "debug" their car using the Race Time Calculator by comparing data between iterations and data with real life tests.
+
 # What is new about V2?
 
 The first version of the Race Time Calculator used a model developed by the 2017 RND team. It had flaws which the team was aware of but unable to solve because the model would be more complicated and require a lot more computation. Still 2017 won the best RND award in the nationals competeion for their research.
