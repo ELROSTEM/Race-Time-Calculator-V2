@@ -20,11 +20,11 @@ The Race Time Calculator, built by RR's R&D team, the purpose of the race time c
 ![image](https://user-images.githubusercontent.com/65325330/145687502-010de8e2-9607-4480-90bd-4636e97b79c9.png)
 
 # Statement of Need
-The Race Time Calculator will serve as a virtual track for F1 in schools teams. However, this app is more thatn that. With our app we will solve the following problems currently present in the whole F1 in schools competetion itself:
+The Race Time Calculator will serve as a virtual track for F1 in schools teams. However, this app is more than that. With our app we will solve the following problems currently present in the whole F1 in schools competetion:
 
-- Lower the barrier of entry: If a school wanted to test their dragster they would need to purchase a track. The track costs $500. We will allow more underprivileged schools to join the competition by giving them access to our race time calculator.
+- Lower the barrier of entry: If a school wanted to test their dragster they would need to purchase a track. The track costs $4000. We will allow underprivileged schools to join the competition by giving them access to our race time calculator.
 
-- Help existing teams without a track: In 2017, a team from Michigan asked if they could come all the way to NYC to test their car model because we have a track. They came all the way to Eleanor Roosevelt Highschool to test their model and their dragster actually won second place nationaly. This made us realize how crucial it is to test car models and that was how the Race Time Calculator poject started.
+- Help existing teams without a track: In 2017, a team from Michigan asked if they could come all the way to NYC to test their car model because we have a track. They came all the way to Eleanor Roosevelt Highschool to test their model and their dragster actually won second place nationaly. This made us realize how crucial it was to test car models which kicked off the project for a Race Time Calculator in R&D.
 
 - Streamline the development process: All teams will be able to benefit from this app. If a team used the Race Time calculator they would be able to iterate through multiple models extremely quickly. This is because they would be able to calculate the theortical end time of their car model, IF their manufacturing was perfect. Therefore, if they calculated that their car reached their time goals then the only process the engineering team needs to worry about is polishing their manufacturing as much as possible.
 
