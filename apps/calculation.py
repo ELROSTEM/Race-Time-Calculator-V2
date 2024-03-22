@@ -30,13 +30,18 @@ def app():
     with form_dva.container():
         with st.form(key='form_dva'):
             #Drag
-            area = st.number_input("Car Front area")
-            drag_mu = st.number_input("Drag Coeffecient")
+            # area = st.number_input("Car Front area")
+            # drag_mu = st.number_input("Drag Coeffecient")
 
             #DVA
-            car_mass = st.number_input("CarMas")
-            friction_mu = st.number_input("Friction Mu")
-            submit = st.form_submit_button(label='Submit')
+            # car_mass = st.number_input("Car Mass")
+            # friction_mu = st.number_input("Friction Mu")
+            # submit = st.form_submit_button(label='Submit')
+            area = 0.002
+            drag_mu = 0.03
+            car_mass = 25
+            friction_mu = 0.03
+            submit = True
 
     try:
         if submit == True:
@@ -62,8 +67,9 @@ def app():
                 Co2_mass = pd.read_csv(Co2_mass)
                 
                 #Create one dataframe
-                df_loaded = pd.merge(F_thrust, Co2_mass , on='time(s)')
+                df_loaded = pd.merge(F_thrust, Co2_mass, on='time(s)')
                 df_loaded = df_loaded.drop(columns="time(s)")
+                #df = pd.merge([df, df_loaded.reindex(df.index)])
                 df = pd.concat([df, df_loaded.reindex(df.index)], axis=1)
                 
                 #Create total mass as mass
@@ -90,13 +96,17 @@ def app():
                 while df_dva['distance(m)'].values[-1] < 20:
                     """While the distance is not greater than 20 contiue calculating"""
 
+                    #print("df_dva\n",df_dva)
+
                     #Append the known values
-                    df_dva = df_dva.append({
-                        'time(s)': df.loc[index, 'time(s)'],
-                        'F-thrust(N)': df.loc[index, 'F-thrust(N)'],
-                        'mass(g)': df.loc[index, 'mass(g)'],
-                        'F-friction(N)': df.loc[index, 'F-friction(N)'], 
-                        }, ignore_index=True)
+                    df_dva = pd.concat([df_dva,pd.DataFrame(
+                        {
+                        'time(s)': [df.loc[index, 'time(s)']],
+                        'F-thrust(N)': [df.loc[index, 'F-thrust(N)']],
+                        'mass(g)': [df.loc[index, 'mass(g)']],
+                        'F-friction(N)': [df.loc[index, 'F-friction(N)']], 
+                        }
+                        )], ignore_index=True)
                     
                     #Read the Drag based off the previous velocity
                     """The problem is here the list is here right beneath the word here """
@@ -195,6 +205,6 @@ def app():
 
 
 
-    except Exception as e:
-        st.warning(e)
+    except Exception as exception:
+        st.warning(exception)
 
