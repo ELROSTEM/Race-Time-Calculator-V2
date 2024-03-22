@@ -78,11 +78,12 @@ def app():
                 df = df.rename(columns={"Co2-mass(g)": "mass(g)"})
 
                 #Fill Nan values
-                df['mass(g)'] = df['mass(g)'].fillna(Co2_empty)
+                df['mass(g)'] = df['mass(g)'].fillna(Co2_empty)#[]p[][][]]
                 df['F-thrust(N)'] = df['F-thrust(N)'].fillna(0)
 
                 #Calculate Friction Force
                 df['F-friction(N)'] = [cal_friction_f(total_mass=row,friction_mu=friction_mu) for row in df['mass(g)']]
+                print(df)
 
 
             ############################################################3
@@ -110,6 +111,28 @@ def app():
                     
                     #Read the Drag based off the previous velocity
                     """The problem is here the list is here right beneath the word here """
+                    #Get variable datavalues
+                    F_T = df_dva.loc[index, 'F-thrust(N)']
+                    F_f = df_dva.loc[index, 'F-friction(N)']
+                    F_d = df_dva.loc[index, 'F-drag(N)']
+                    m = df_dva.loc[index, 'mass(g)']
+                    v = df_dva.loc[index, 'velocity(m/s)']
+                    x = df_dva.loc[index, 'distance(m)']
+                    dt = interval
+                    
+                    #Calculations
+                    F_net = F_T - F_f - F_d
+                    a = F_net/m
+                    dv = a*dt
+                    dx = v*dx
+                    v += dv
+                    x += dx
+
+                    #reassign values
+                    
+
+
+
                     df_dva.loc[index, 'F-drag(N)'] = cal_drag_f(area=area, drag_mu=drag_mu, velocity=df_dva.loc[index-1, 'velocity(m/s)'])
 
                     #Calculate the Fnet
