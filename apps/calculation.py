@@ -30,12 +30,13 @@ def app():
     with form_dva.container():
         with st.form(key='form_dva'):
             #Drag
-            area = st.number_input("Car Front area")
-            drag_mu = st.number_input("Drag Coeffecient")
+            area = st.number_input("Car Front area (m^2)")
+            drag_mu = st.number_input("Drag Coefficient")
 
             #DVA
-            car_mass = st.number_input("CarMas")
-            friction_mu = st.number_input("Friction Mu")
+            car_mass = st.number_input("Car Mass (g)")
+            friction_mu = st.number_input("Friction Coefficient")
+
             submit = st.form_submit_button(label='Submit')
 
     try:
@@ -88,36 +89,36 @@ def app():
 
                 index = 1
                 while df_dva['distance(m)'].values[-1] < 20:
-                    """While the distance is not greater than 20 contiue calculating"""
+                    """While the distance is not greater than 20 continue calculating"""
 
-                    #Append the known values
-                    df_dva = df_dva.append({
-                        'time(s)': df.loc[index, 'time(s)'],
-                        'F-thrust(N)': df.loc[index, 'F-thrust(N)'],
-                        'mass(g)': df.loc[index, 'mass(g)'],
-                        'F-friction(N)': df.loc[index, 'F-friction(N)'], 
-                        }, ignore_index=True)
-                    
-                    #Read the Drag based off the previous velocity
+                    # Append the known values
+                    df_dva = pd.concat([df_dva, pd.DataFrame({
+                        'time(s)': [df.loc[index, 'time(s)']],
+                        'F-thrust(N)': [df.loc[index, 'F-thrust(N)']],
+                        'mass(g)': [df.loc[index, 'mass(g)']],
+                        'F-friction(N)': [df.loc[index, 'F-friction(N)']]
+                    })], ignore_index=True)
+
+                    # Read the Drag based off the previous velocity
                     """The problem is here the list is here right beneath the word here """
                     df_dva.loc[index, 'F-drag(N)'] = cal_drag_f(area=area, drag_mu=drag_mu, velocity=df_dva.loc[index-1, 'velocity(m/s)'])
 
-                    #Calculate the Fnet
+                    # Calculate the Fnet
                     df_dva.loc[index, 'F-net(N)'] = (df_dva.loc[index, 'F-thrust(N)'] - df_dva.loc[index, 'F-friction(N)'] - df_dva.loc[index, 'F-drag(N)'])
 
-                    #Calculate the acceleration
-                    df_dva.loc[index, 'acceleration(m/s^2)'] = (df_dva.loc[index, 'F-net(N)']/df_dva.loc[index, 'mass(g)'] * 1000)
+                    # Calculate the acceleration
+                    df_dva.loc[index, 'acceleration(m/s^2)'] = (df_dva.loc[index, 'F-net(N)'] / df_dva.loc[index, 'mass(g)'] * 1000)
 
-                    #Calculate the delta-velocity
+                    # Calculate the delta-velocity
                     df_dva.loc[index, 'delta-v(m/s)'] = (interval * (df_dva.loc[index-1, 'acceleration(m/s^2)'] + df_dva.loc[index, 'acceleration(m/s^2)']) / 2)
 
-                    #Calculate the velocity
+                    # Calculate the velocity
                     df_dva.loc[index, 'velocity(m/s)'] = (df_dva.loc[index-1, 'velocity(m/s)'] + df_dva.loc[index, 'delta-v(m/s)'])
 
-                    #Calculate the delta-distance
+                    # Calculate the delta-distance
                     df_dva.loc[index, 'delta-d(m)'] = (interval * (df_dva.loc[index-1, 'velocity(m/s)'] + df_dva.loc[index, 'velocity(m/s)']) / 2)
 
-                    #Calculate the distance
+                    # Calculate the distance
                     df_dva.loc[index, 'distance(m)'] = (df_dva.loc[index-1, 'distance(m)'] + df_dva.loc[index, 'delta-d(m)'])
 
                     index += 1
