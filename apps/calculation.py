@@ -3,7 +3,7 @@ from time import sleep
 import numpy as np
 import streamlit as st
 import pandas as pd
-import scipy
+from scipy.integrate import odeint
 
 """
 All variables are in expressed in SI base units.
@@ -112,7 +112,7 @@ def app():
                 y_0 = [car_mass, 0., 0.]
                 time = np.arange(0.,1.5,0.001)
 
-                solution = scipy.integrate.odeint(car, y_0, time, args = (drag_coeff, frontal_area, car_mass))
+                solution = odeint(car, y_0, time, args = (drag_coeff, frontal_area, car_mass))
                 
                 msol = solution[:, 0]
                 vsol = solution[:, 1]
