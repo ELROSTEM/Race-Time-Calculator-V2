@@ -118,6 +118,7 @@ def app():
                 vsol = solution[:, 1]
                 xsol = solution[:, 2]
 
+
                 #calculated values
                 Fsol = (thrust(time) - drag(frontal_area, drag_coeff, vsol) - friction(msol, friction_mu))
                 asol = Fsol/msol
