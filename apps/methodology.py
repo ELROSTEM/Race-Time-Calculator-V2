@@ -41,7 +41,7 @@ def app():
 
     Our engineering team opted for the last option since it required the least knowledge but the most validity. After tracking the position of the test car, the velocity was calculated and a logistic model was fitted to the velocity data. 
 
-    ![alt text](https://github.com/ELROSTEM/Race-Time-Calculator-V2/blob/main/apps/image-1.png)
+    ![methodology_figure_1](https://github.com/user-attachments/assets/bb0bdd56-26d6-4427-86da-63a2487dff79)
 
     A corrective factor of $\frac{a}{1+e^{-c}}$ was subtracted from the sigmoid term to ensure that the intial velocity is zero.
 
