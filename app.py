@@ -1,6 +1,6 @@
 import streamlit as st
 
-from apps import calculation, homepage
+from apps import calculation, homepage, methodology
 from multiapp import MultiApp
 
 st.set_page_config(
@@ -14,6 +14,7 @@ apps = MultiApp()
 # Add all your application here
 apps.add_app("Home", homepage.app)
 apps.add_app("Calc", calculation.app)
+apps.add_app("Methodology", methodology.app)
 
 # The main app
 apps.run()
