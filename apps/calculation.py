@@ -1,11 +1,9 @@
 from time import sleep
 
 import numpy as np
-import scipy.integrate
 import streamlit as st
 import pandas as pd
 import scipy
-from scipy.integrate import odeint
 
 """
 All variables are in expressed in SI base units.
