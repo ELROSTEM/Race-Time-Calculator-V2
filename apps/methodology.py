@@ -41,7 +41,7 @@ def app():
 
     Our engineering team opted for the last option since it required the least knowledge but the most validity. After tracking the position of the test car, the velocity was calculated and a logistic model was fitted to the velocity data. 
 
-    ![alt text](image-1.png)
+    ![alt text](https://github.com/ELROSTEM/Race-Time-Calculator-V2/blob/main/apps/image-1.png)
 
     A corrective factor of $\frac{a}{1+e^{-c}}$ was subtracted from the sigmoid term to ensure that the intial velocity is zero.
 
@@ -125,11 +125,7 @@ def app():
     $$
     a = \frac{1}{m}\left(F_{thrust}-\frac{1}{2}\rho_ac_dAv^2\right)
     $$
-    Expressing the equation in terms of the position $x$:
-    $$
-    \frac{d^2x}{dt^2} = \frac{1}{m}\left(F_{thrust}-\frac{1}{2}\rho_ac_dA\left(\frac{dx}{dt}\right)^2\right)
-    $$
-    Rewriting the equation as a system of ODEs to get rid of second-order terms:
+    Expressing the equation in terms of the position $x$ and rewriting the equation as a system of ODEs to get rid of second-order terms:
     $$
     \frac{dv}{dt} = \frac{1}{m}\left(F_{thrust}(t)-\frac{1}{2}\rho_ac_dAv^2\right)\\
     \frac{dx}{dt} = v
@@ -146,6 +142,7 @@ def app():
     \frac{1}{m}\left(F_{thrust}(t)-\frac{1}{2}\rho_ac_dAv^2\right)\\
     v
     \end{bmatrix}
+
     \\
     \ \\
     m_c = m - m_0 + 0.008

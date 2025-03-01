@@ -17,14 +17,14 @@ def drag(area, drag_mu, velocity, fluid_density  = 1.225):
     return Df
 
 def friction(total_mass, friction_mu):
-    Ff = total_mass/1000*9.81*friction_mu
+    Ff = total_mass*9.81*friction_mu
     return Ff
 
-def pressure(cartridge_mass, model = 'van_der_waals'):
+def pressure(cartridge_mass, model = 'van der waals'):
     if model == "ideal":
         factor = 3.90e9
         P = factor*cartridge_mass 
-    if model == "van_der_waals":
+    if model == "van der waals":
         # CO2 van der waals constants
         a = 0.364
         b = 0.00004267
@@ -51,15 +51,7 @@ def ssqrt(x):
     return np.sign(x)*np.sqrt(abs(x))
 
 def app():
-    """
-    This is the main app function
-    """
-    #Constant
-    dt = 0.001
 
-    ##############################################################################################
-    """Get Data"""
-    #Form
     form_dva = st.empty()
     with form_dva.container():
         with st.form(key='form_dva'):
@@ -76,9 +68,15 @@ def app():
             drag_coeff = st.number_input(label="Drag coefficient",min_value=0.,value=0.72936,format='%.3f')
             car_mass = 0.001*st.number_input(label="Car mass (g)",min_value=0.,value=58.)
 
-            # for now, friction is zero until an Advanced Options tab is implemented
-            # friction_mu = st.number_input("Friction Mu")
-            friction_mu = 0.
+            with st.expander('Advanced Options'):
+                friction_mu = st.number_input(label="Friction Coefficient", min_value=0.,value=0.)
+                radius = st.number_input(label="CO2 exit radius (mm)", min_value=0.7)
+                
+                st.write("Solver options")
+                dt = st.number_input(label="dt",value=0.001,format='%.4f')
+                max_time = st.number_input(label="Maximum Time (s)",value=1.5)
+                max_distance = st.number_input(label="Maximum Distance (m)",value=20.)
+                pressure_model = st.selectbox("Pressure model",("van der waals","ideal"),0)
 
             submit = st.form_submit_button(label='Submit')
 
@@ -101,7 +99,7 @@ def app():
                 def car(y, t, c_d, A_f, m_0):
                     mass, xdot, x = y
                     rhoc = (mass - m_0 + 0.008)/1.14e-5
-                    ydot = [-A_e*rhoc*min(v_e,ssqrt(2*(pressure(mass - m_0 + 0.008)-P_a)/rhoc)), 
+                    ydot = [-A_e*rhoc*min(v_e,ssqrt(2*(pressure(mass - m_0 + 0.008, pressure_model)-P_a)/rhoc)), 
                             (1/mass)*(thrust(t) - drag(frontal_area, c_d, xdot) - friction(mass, friction_mu)), 
                             xdot
                             ]
@@ -110,7 +108,7 @@ def app():
                 #intialize and generate solution
                 
                 y_0 = [car_mass, 0., 0.]
-                time = np.arange(0.,1.5,0.001)
+                time = np.arange(0.,max_time,dt)
 
                 solution = odeint(car, y_0, time, args = (drag_coeff, frontal_area, car_mass))
                 
@@ -133,7 +131,7 @@ def app():
 
             for i, x in enumerate(xsol):
                 end_time = time[i]
-                if x >= 20:
+                if x >= max_distance:
                     break
 
             metric_col1, metric_col2 = st.columns(2)
@@ -144,36 +142,20 @@ def app():
         #---------------------------------------
         #Graphs
             
-            acc_dataframe = pd.DataFrame(asol, index = time, columns=['acceleration (m/s^2)'])
-            v_dataframe = pd.DataFrame(vsol, index = time, columns=['velocity (m/s)'])
-            d_dataframe = pd.DataFrame(xsol, index = time, columns=['distance (m)'])
+            def display_graph(data, label:str, unit:str):
+                dataframe = pd.DataFrame(data, index = time, columns=[label+" "+unit])
+                st.header(label)
+                col1,col2 = st.columns([3,1])
+                col1.subheader(label+" Graph")
+                col1.line_chart(dataframe, x_label='time (s)', y_label=label+" "+unit)
+                col2.subheader(label+" Data")
+                col2.write(dataframe)
 
-            #Acceleration Graph
-            st.header('Acceleration')
-            acc_col1, acc_col2 = st.columns([3, 1])
-
-            acc_col1.subheader('a-t Graph')
-            acc_col1.line_chart(acc_dataframe, x_label='time (s)', y_label="acceleration (m/s^2)")
-            acc_col2.subheader('Acceleration Data')
-            acc_col2.write(acc_dataframe)
-
-            #Velocity Graph
-            st.header('Velocity')
-            v_col1, v_col2 = st.columns([3, 1])
-
-            v_col1.subheader('v-t Graph')
-            v_col1.line_chart(v_dataframe, x_label='time (s)', y_label="velocity (m/s)")
-            v_col2.subheader('Velocity Data')
-            v_col2.write(v_dataframe)
-            
-            #Distance Graph
-            st.header('Distance')
-            d_col1, d_col2 = st.columns([3, 1])
-
-            d_col1.subheader('d-t Graph')
-            d_col1.line_chart(d_dataframe, x_label='time (s)', y_label="distance (m)")
-            d_col2.subheader('Distance Data')
-            d_col2.write(d_dataframe)
+            display_graph(asol, "Acceleration", "(m/s^2)")
+            display_graph(vsol, "Velocity", "(m/s)")
+            display_graph(xsol, "Distance", "(m)")
+            display_graph(msol, "Mass", "(kg)")
+            display_graph(Fsol, "Net Force", "(N)")
 
             st.header("The full data table:")
             full_table = pd.DataFrame(data={'time (s)':time, 
