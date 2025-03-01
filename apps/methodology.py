@@ -39,9 +39,11 @@ def app():
 
     There are many ways to calculate the thrust over time. We can model the CO2 releasing from the cartridge as a insetropic process and analyticaly derive the thrust equation from thermodynamic principles. We can simulate the release of CO2 using a sufficiently fine mesh, an appropriate model, and a capable CFD solver. We can attach a cartridge on a heavy, low friction test car and track the movement of the car, making sure the effects of friction and drag are relatively insignificant.  
 
+    
+    
     Our engineering team opted for the last option since it required the least knowledge but the most validity. After tracking the position of the test car, the velocity was calculated and a logistic model was fitted to the velocity data. 
 
-    ![image](https://github.com/user-attachments/assets/bb0bdd56-26d6-4427-86da-63a2487dff79)
+    ![image](methodology_figure_1.png)
 
     A corrective factor of $\frac{a}{1+e^{-c}}$ was subtracted from the sigmoid term to ensure that the intial velocity is zero.
 
