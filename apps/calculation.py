@@ -9,12 +9,12 @@ from scipy.integrate import odeint
 All variables are in expressed in SI base units.
 """
 
-def drag(area, c_d, u_inf, u, rho = 1.225):
+def drag(area, c_d, velocity_inf, velocity, density = 1.225):
     """
     The ISA or International Standard Atmosphere states the density of air is 1.225 kg/m3 at sea level and 15 degrees C.
     """
     b = 1.95508
-    Df = 0.5*rho*area*c_d*(u**b)/(u_inf**(b-2))
+    Df = 0.5*density*area*c_d*(velocity**b)/(velocity_inf**(b-2))
     return Df
 
 def friction(total_mass, friction_mu):
@@ -83,7 +83,7 @@ def app():
 
             submit = st.form_submit_button(label='Submit')
 
-    try:
+    # try:
         if submit == True:
             #Clear Form
             form_dva.empty()
@@ -99,11 +99,11 @@ def app():
                 A_e = np.pi*(radius*0.001)**2
 
                 #kinematic equations
-                def car(y, t, m_0):
+                def car(y, t, m_0, A_f):
                     mass, xdot, x = y
                     rhoc = (mass - m_0 + 0.008)/1.14e-5
                     ydot = [-A_e*rhoc*min(v_e,ssqrt(2*(pressure(mass - m_0 + 0.008, pressure_model)-P_a)/rhoc)), 
-                            (1/mass)*(thrust(t) - drag(frontal_area, drag_coeff, measured_velocity, xdot) - friction(mass, friction_mu)), 
+                            (1/mass)*(thrust(t) - drag(A_f, drag_coeff, measured_velocity, xdot) - friction(mass, friction_mu)), 
                             xdot
                             ]
                     return ydot
@@ -113,15 +113,15 @@ def app():
                 y_0 = [car_mass, 0., 0.]
                 time = np.arange(0.,max_time,dt)
 
-                solution = odeint(car, y_0, time, args = tuple(car_mass))
+                solution = odeint(car, y_0, time, args = (car_mass, frontal_area))
                 
                 msol = solution[:, 0]
                 vsol = solution[:, 1]
                 xsol = solution[:, 2]
 
 
-                #calculated values
-                Fsol = (thrust(time) - drag(frontal_area, drag_coeff, vsol) - friction(msol, friction_mu))
+                #calculated value
+                Fsol = (thrust(time) - drag(frontal_area, drag_coeff, measured_velocity, vsol) - friction(msol, friction_mu))
                 asol = Fsol/msol
 
             st.success('Done!')
@@ -178,6 +178,6 @@ def app():
 
 
 
-    except Exception as exception:
-        st.warning(exception)
+    # except Exception as exception:
+    #     st.warning(exception)
 
