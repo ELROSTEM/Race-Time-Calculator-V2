@@ -13,7 +13,7 @@ apps = MultiApp()
 
 # Add all your application here
 apps.add_app("Calc", calculation.app)
-apps.add_app("Methodology", methodology.app)
+# apps.add_app("Methodology", methodology.app)
 apps.add_app("About", homepage.app)
 
 # The main app

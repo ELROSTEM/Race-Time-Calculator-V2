@@ -9,11 +9,12 @@ from scipy.integrate import odeint
 All variables are in expressed in SI base units.
 """
 
-def drag(area, drag_mu, velocity, fluid_density  = 1.225):
+def drag(area, c_d, u_inf, u, rho = 1.225):
     """
     The ISA or International Standard Atmosphere states the density of air is 1.225 kg/m3 at sea level and 15 degrees C.
     """
-    Df = area*drag_mu*0.5*fluid_density*(velocity**2)
+    b = 1.95508
+    Df = 0.5*rho*area*c_d*(u**b)/(u_inf**(b-2))
     return Df
 
 def friction(total_mass, friction_mu):
@@ -66,6 +67,8 @@ def app():
 
             frontal_area = st.number_input(label="Car frontal area (m^2)",min_value=0.,value=2*0.00112714,format='%.8f')
             drag_coeff = st.number_input(label="Drag coefficient",min_value=0.,value=0.72936,format='%.3f')
+            measured_velocity = st.number_input(label="Freestream velocity",value=20.,
+                                                help="The inlet condition velocity used to find your drag coefficient.")
             car_mass = 0.001*st.number_input(label="Car mass (g)",min_value=0.,value=58.)
 
             with st.expander('Advanced Options'):
@@ -96,11 +99,11 @@ def app():
                 A_e = np.pi*(radius*0.001)**2
 
                 #kinematic equations
-                def car(y, t, c_d, A_f, m_0):
+                def car(y, t, m_0):
                     mass, xdot, x = y
                     rhoc = (mass - m_0 + 0.008)/1.14e-5
                     ydot = [-A_e*rhoc*min(v_e,ssqrt(2*(pressure(mass - m_0 + 0.008, pressure_model)-P_a)/rhoc)), 
-                            (1/mass)*(thrust(t) - drag(frontal_area, c_d, xdot) - friction(mass, friction_mu)), 
+                            (1/mass)*(thrust(t) - drag(frontal_area, drag_coeff, measured_velocity, xdot) - friction(mass, friction_mu)), 
                             xdot
                             ]
                     return ydot
@@ -110,7 +113,7 @@ def app():
                 y_0 = [car_mass, 0., 0.]
                 time = np.arange(0.,max_time,dt)
 
-                solution = odeint(car, y_0, time, args = (drag_coeff, frontal_area, car_mass))
+                solution = odeint(car, y_0, time, args = tuple(car_mass))
                 
                 msol = solution[:, 0]
                 vsol = solution[:, 1]
