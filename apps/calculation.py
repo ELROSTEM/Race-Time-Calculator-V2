@@ -83,7 +83,7 @@ def app():
 
             submit = st.form_submit_button(label='Submit')
 
-    # try:
+    try:
         if submit == True:
             #Clear Form
             form_dva.empty()
@@ -178,6 +178,6 @@ def app():
 
 
 
-    # except Exception as exception:
-    #     st.warning(exception)
+    except Exception as exception:
+        st.warning(exception)
 
