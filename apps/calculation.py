@@ -69,7 +69,7 @@ def app():
             drag_coeff = st.number_input(label="Drag coefficient",min_value=0.,value=0.72936,format='%.3f')
             measured_velocity = st.number_input(label="Freestream velocity",value=20.,
                                                 help="The inlet condition velocity used to find your drag coefficient.")
-            car_mass = 0.001*st.number_input(label="Car mass (g)",min_value=0.,value=58.)
+            car_mass = 0.008+0.001*st.number_input(label="Car mass without cartridge (g)",min_value=0.,value=50.)
 
             with st.expander('Advanced Options'):
                 friction_mu = st.number_input(label="Friction Coefficient", min_value=0.,value=0.)
