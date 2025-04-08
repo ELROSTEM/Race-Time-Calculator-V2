@@ -7,7 +7,7 @@ def app():
     Race Time Calculator for the STEM Racing competition.
     Built with: Python 🐍, Streamlit
 
-    ![image](https://github.com/user-attachments/assets/e6d01ca1-9c20-42a6-a173-a7725154b010)
+    ![image](https://raw.githubusercontent.com/ELROSTEM/Race-Time-Calculator-V2/refs/heads/main/.github/images/RTC%20cover.jpg)
 
     # Who are the Roosevelt Racers (RR)?
 
@@ -21,7 +21,7 @@ def app():
 
     The Race Time Calculator, built by our engineering team, was designed to complement our design process by creating a virtual testing environment for car models. The original Race Time Calculator was built by the R&D division of the 2020-2021 Roosevelt Racers Team to serve as an indicator of whether or not a dragster should be manufactured. This season, we aimed to incorporate the Calculator into a design process by developing an approximate, if not fully accurate, model of car motion capable of comparing car models based on physical parameters. Our ultimate vision is to create software that accelerates the engineering process for our dragsters as well as to create a product polished enough for other teams to utilize in their engineering endeavors.
 
-    ![image](https://github.com/user-attachments/assets/58490479-7a40-4d55-844b-f1140ab2914f)
+    ![image](https://raw.githubusercontent.com/ELROSTEM/Race-Time-Calculator-V2/refs/heads/main/.github/images/screenshot.png)
 
     '''
     st.markdown(text)
